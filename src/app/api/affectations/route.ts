@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { startOfWeek, parseISO, addDays, format, isWithinInterval } from 'date-fns';
-import { getAffectations, getClientById, getEmployeeById, createAffectation } from '@/lib/store';
+import { ensureInitialized, getAffectations, getClientById, getEmployeeById, createAffectation } from '@/lib/store';
 import { errorResponse, parseBody, getSearchParams } from '@/lib/api-utils';
 import type { Affectation } from '@/lib/types';
 
@@ -14,6 +14,7 @@ import type { Affectation } from '@/lib/types';
  */
 export async function GET(request: Request) {
   try {
+    ensureInitialized();
     const params = getSearchParams(request);
     const date = params.get('date');
     const week = params.get('week');
@@ -52,6 +53,7 @@ export async function GET(request: Request) {
  */
 export async function POST(request: Request) {
   try {
+    ensureInitialized();
     const { data, error } = await parseBody<Omit<Affectation, 'id' | 'created_at'>>(request);
     if (error) return error;
 

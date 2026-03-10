@@ -15,6 +15,7 @@ interface MatchingModalProps {
   clientName: string;
   date: string;
   absentEmployeeName: string;
+  absentEmployeeId?: string;
 }
 
 interface AIAnalysis {
@@ -38,6 +39,7 @@ export function MatchingModal({
   clientName,
   date,
   absentEmployeeName,
+  absentEmployeeId,
 }: MatchingModalProps) {
   const [data, setData] = useState<MatchingData | null>(null);
   const [client, setClient] = useState<Client | null>(null);
@@ -87,11 +89,48 @@ export function MatchingModal({
   const handleValidate = async (candidate: MatchCandidate) => {
     setValidating(true);
     try {
+      // First, find or create an absence record for this client+date
+      let absenceId: string | null = null;
+
+      // Try to find an existing open absence
+      const searchRes = await fetch(`/api/absences?date=${date}&status=ouverte`);
+      if (searchRes.ok) {
+        const searchJson = await searchRes.json();
+        const existing = searchJson.data?.find(
+          (a: { client_id: string }) => a.client_id === clientId
+        );
+        if (existing) absenceId = existing.id;
+      }
+
+      // If no existing absence found and we have the absent employee ID, create one
+      if (!absenceId && absentEmployeeId) {
+        const absRes = await fetch('/api/absences', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            employe_id: absentEmployeeId,
+            client_id: clientId,
+            date,
+            type: 'imprevue',
+            channel: 'telephone',
+            statut: 'ouverte',
+          }),
+        });
+        if (absRes.ok) {
+          const absJson = await absRes.json();
+          absenceId = absJson.data.id;
+        }
+      }
+
+      if (!absenceId) {
+        throw new Error(t('matching.error_validation'));
+      }
+
       const res = await fetch('/api/matching/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          absence_id: 'abs-001',
+          absence_id: absenceId,
           employe_id: candidate.employe_id,
         }),
       });

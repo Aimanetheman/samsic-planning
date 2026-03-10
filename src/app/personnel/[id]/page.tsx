@@ -46,23 +46,7 @@ export default function PersonnelDetailPage() {
         const json = await res.json();
         setEmployee(json.data);
 
-        // Fetch compatibility data separately via matching endpoint
-        const matchRes = await fetch('/api/matching', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ client_id: 'cli-001', date: new Date().toISOString().split('T')[0] }),
-        });
-        if (matchRes.ok) {
-          const matchJson = await matchRes.json();
-          const candidate = matchJson.data?.candidates?.find(
-            (c: { employe_id: string }) => c.employe_id === id
-          );
-          if (candidate) {
-            // Use score from the matching engine as a reference
-          }
-        }
-
-        // For now, generate simple compatibility scores based on client assignments
+        // Generate compatibility scores based on client assignments and skill overlap
         const clientsRes = await fetch('/api/clients');
         if (clientsRes.ok) {
           const clientsJson = await clientsRes.json();
@@ -273,7 +257,7 @@ export default function PersonnelDetailPage() {
                 <div key={comp.client_id} className="space-y-1.5">
                   <div className="flex items-center justify-between">
                     <Link
-                      href={`/clients`}
+                      href={`/clients/${comp.client_id}`}
                       className="text-sm font-medium text-gray-900 hover:text-primary-600 truncate"
                     >
                       {comp.client_nom}

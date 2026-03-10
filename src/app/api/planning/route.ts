@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { startOfWeek, addDays, format } from 'date-fns';
-import { getClients, getAffectations, getEmployeeById, getAbsences } from '@/lib/store';
+import { ensureInitialized, getClients, getAffectations, getEmployeeById, getAbsences } from '@/lib/store';
 import { errorResponse, getSearchParams } from '@/lib/api-utils';
 import type { DayStatus } from '@/lib/types';
 
@@ -8,35 +8,37 @@ const DAY_NAMES = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi'] as const;
 
 /**
  * Determine the display status for a single day/client cell in the planning grid.
- * Checks absences and affectation type to decide what status to show.
+ * Priority order:
+ *   1. If there is an open absence AND a confirmed replacement -> remplacement
+ *   2. If there is an open absence with no replacement -> absent (the titulaire row shows red)
+ *   3. If there is no active affectation at all -> non_couvert
+ *   4. Otherwise map the affectation type directly
  */
 function determineDayStatus(
   clientId: string,
   date: string
 ): DayStatus {
   const dayAffectations = getAffectations({ client_id: clientId, date });
-  const activeAffectation = dayAffectations.find((a) => a.statut !== 'annule');
+  const activeAffectations = dayAffectations.filter((a) => a.statut !== 'annule');
 
   const dayAbsences = getAbsences({ client_id: clientId, date });
   const hasOpenAbsence = dayAbsences.some(
     (a) => a.statut === 'ouverte' || a.statut === 'non_couverte'
   );
 
+  if (hasOpenAbsence) {
+    // Check if a replacement has been assigned
+    const hasReplacement = activeAffectations.some((a) => a.type === 'remplacement');
+    return hasReplacement ? 'remplacement' : 'absent';
+  }
+
+  // No absence -- find the most relevant affectation
+  const activeAffectation = activeAffectations[0] || null;
+
   if (!activeAffectation) {
-    return hasOpenAbsence ? 'non_couvert' : 'non_couvert';
+    return 'non_couvert';
   }
 
-  // Absence exists with a replacement affectation
-  if (hasOpenAbsence && activeAffectation.type === 'remplacement') {
-    return 'remplacement';
-  }
-
-  // Absence exists but affectation is the titulaire (who is absent)
-  if (hasOpenAbsence && activeAffectation.type !== 'remplacement') {
-    return 'absent';
-  }
-
-  // No absence -- map affectation type directly
   const typeToStatus: Record<string, DayStatus> = {
     titulaire: 'titulaire',
     formation: 'formation',
@@ -51,27 +53,27 @@ function determineDayStatus(
  * GET /api/planning
  * Returns a weekly planning matrix.
  * Query: ?week=YYYY-MM-DD (any date in the target week)
+ * If ?week is omitted, defaults to the current week.
  * Returns Mon-Fri grid with client rows and day columns.
  */
 export async function GET(request: Request) {
   try {
+    ensureInitialized();
+
     const params = getSearchParams(request);
     const weekParam = params.get('week');
 
-    if (!weekParam) {
-      return errorResponse(400, 'VALIDATION_ERROR', 'Le parametre ?week=YYYY-MM-DD est obligatoire');
-    }
-
-    const targetDate = new Date(weekParam);
+    // Default to current week if no week param provided
+    const targetDate = weekParam ? new Date(weekParam) : new Date();
     if (isNaN(targetDate.getTime())) {
       return errorResponse(400, 'VALIDATION_ERROR', `Date invalide: '${weekParam}'`);
     }
 
     const monday = startOfWeek(targetDate, { weekStartsOn: 1 });
     const friday = addDays(monday, 4);
-    const clients = getClients();
+    const allClients = getClients();
 
-    const planning = clients.map((client) => {
+    const planning = allClients.map((client) => {
       const days = DAY_NAMES.map((dayName, index) => {
         const date = format(addDays(monday, index), 'yyyy-MM-dd');
 

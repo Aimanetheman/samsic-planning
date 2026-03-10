@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getEmployees, createEmployee } from '@/lib/store';
+import { ensureInitialized, getEmployees, createEmployee } from '@/lib/store';
 import { errorResponse, parseBody, getSearchParams } from '@/lib/api-utils';
 import type { Employee } from '@/lib/types';
 
@@ -9,6 +9,7 @@ import type { Employee } from '@/lib/types';
  */
 export async function GET(request: Request) {
   try {
+    ensureInitialized();
     const params = getSearchParams(request);
     const search = params.get('search')?.toLowerCase();
     const status = params.get('status');
@@ -48,6 +49,7 @@ export async function GET(request: Request) {
  */
 export async function POST(request: Request) {
   try {
+    ensureInitialized();
     const { data, error } = await parseBody<Omit<Employee, 'id' | 'created_at'>>(request);
     if (error) return error;
 

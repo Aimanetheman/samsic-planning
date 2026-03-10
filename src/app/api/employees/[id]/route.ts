@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getEmployeeById, updateEmployee } from '@/lib/store';
+import { ensureInitialized, getEmployeeById, updateEmployee } from '@/lib/store';
 import { errorResponse, parseBody } from '@/lib/api-utils';
 import type { Employee } from '@/lib/types';
 
@@ -11,6 +11,7 @@ type RouteContext = { params: Promise<{ id: string }> };
  */
 export async function GET(_request: Request, context: RouteContext) {
   try {
+    ensureInitialized();
     const { id } = await context.params;
     const employee = getEmployeeById(id);
 
@@ -31,6 +32,7 @@ export async function GET(_request: Request, context: RouteContext) {
  */
 export async function PATCH(request: Request, context: RouteContext) {
   try {
+    ensureInitialized();
     const { id } = await context.params;
     const { data, error } = await parseBody<Partial<Employee>>(request);
     if (error) return error;

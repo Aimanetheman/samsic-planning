@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAffectationById, updateAffectation } from '@/lib/store';
+import { ensureInitialized, getAffectationById, updateAffectation } from '@/lib/store';
 import { errorResponse, parseBody } from '@/lib/api-utils';
 import type { Affectation } from '@/lib/types';
 
@@ -11,6 +11,7 @@ type RouteContext = { params: Promise<{ id: string }> };
  */
 export async function PATCH(request: Request, context: RouteContext) {
   try {
+    ensureInitialized();
     const { id } = await context.params;
     const { data, error } = await parseBody<Partial<Affectation>>(request);
     if (error) return error;

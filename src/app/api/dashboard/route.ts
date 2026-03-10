@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { format } from 'date-fns';
-import { getDashboardKPI, getAlerts, getAffectations } from '@/lib/store';
+import { ensureInitialized, getDashboardKPI, getAlerts, getAffectations } from '@/lib/store';
 import { errorResponse } from '@/lib/api-utils';
 
 /**
@@ -9,6 +9,7 @@ import { errorResponse } from '@/lib/api-utils';
  */
 export async function GET() {
   try {
+    ensureInitialized();
     const today = format(new Date(), 'yyyy-MM-dd');
 
     const kpi = getDashboardKPI();

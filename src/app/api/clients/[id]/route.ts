@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getClientById, getEmployeeById, updateClient } from '@/lib/store';
+import { ensureInitialized, getClientById, getEmployeeById, updateClient } from '@/lib/store';
 import { errorResponse, parseBody } from '@/lib/api-utils';
 import type { Client } from '@/lib/types';
 
@@ -21,6 +21,7 @@ function resolveEmployeeIds(ids: string[]) {
  */
 export async function GET(_request: Request, context: RouteContext) {
   try {
+    ensureInitialized();
     const { id } = await context.params;
     const client = getClientById(id);
 
@@ -49,6 +50,7 @@ export async function GET(_request: Request, context: RouteContext) {
  */
 export async function PATCH(request: Request, context: RouteContext) {
   try {
+    ensureInitialized();
     const { id } = await context.params;
     const { data, error } = await parseBody<Partial<Client>>(request);
     if (error) return error;

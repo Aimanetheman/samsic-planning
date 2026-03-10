@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import {
+  ensureInitialized,
   getAbsenceById,
   getEmployeeById,
   getClientById,
@@ -18,9 +19,14 @@ interface ValidateRequest {
  * POST /api/matching/validate
  * Validate a replacement: creates an affectation, marks the absence as covered,
  * and generates a confirmation alert.
+ *
+ * Works with any valid absence_id -- looks up the linked client from the
+ * absence record rather than assuming a specific ID.
  */
 export async function POST(request: Request) {
   try {
+    ensureInitialized();
+
     const { data, error } = await parseBody<ValidateRequest>(request);
     if (error) return error;
 
@@ -48,6 +54,7 @@ export async function POST(request: Request) {
       return errorResponse(404, 'NOT_FOUND', `Employe '${data.employe_id}' introuvable`);
     }
 
+    // Derive client from the absence record, not from hardcoded values
     const client = getClientById(absence.client_id);
     if (!client) {
       return errorResponse(404, 'NOT_FOUND', `Client '${absence.client_id}' introuvable`);
@@ -68,11 +75,11 @@ export async function POST(request: Request) {
       remplacement_id: affectation.id,
     });
 
-    // Generate confirmation alert
+    // Generate confirmation alert with the correct type
     createAlert({
-      type: 'poste_non_couvert', // reusing closest type -- this is a confirmation
+      type: 'remplacement_confirme',
       priority: 'info',
-      title: `Remplacement confirme chez ${client.nom}`,
+      title: `Remplacement confirmé chez ${client.nom}`,
       description: `${employee.prenom} ${employee.nom} remplace le ${absence.date} chez ${client.nom}.`,
       related_client_id: client.id,
       related_employe_id: employee.id,

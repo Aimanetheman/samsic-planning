@@ -39,6 +39,7 @@ interface ModalState {
   clientName: string;
   date: string;
   absentEmployeeName: string;
+  absentEmployeeId: string;
 }
 
 function getMonday(date: Date): Date {
@@ -65,6 +66,7 @@ export default function PlanningPage() {
     clientName: '',
     date: '',
     absentEmployeeName: '',
+    absentEmployeeId: '',
   });
   const { t, locale } = useTranslation();
   const dateLocaleStr = getDateLocale(locale);
@@ -130,7 +132,8 @@ export default function PlanningPage() {
     clientId: string,
     clientName: string,
     date: string,
-    absentName: string
+    absentName: string,
+    absentId: string
   ) => {
     setModal({
       isOpen: true,
@@ -138,6 +141,7 @@ export default function PlanningPage() {
       clientName,
       date,
       absentEmployeeName: absentName,
+      absentEmployeeId: absentId,
     });
   };
 
@@ -246,6 +250,7 @@ export default function PlanningPage() {
                       const absentName = day.employee
                         ? `${day.employee.prenom} ${day.employee.nom}`
                         : 'Inconnu';
+                      const absentId = day.employee?.id ?? '';
 
                       return (
                         <td key={day.date} className="px-2 py-2">
@@ -258,7 +263,8 @@ export default function PlanningPage() {
                                 row.client.id,
                                 row.client.nom,
                                 day.date,
-                                absentName
+                                absentName,
+                                absentId
                               )
                             }
                           />
@@ -306,6 +312,7 @@ export default function PlanningPage() {
         clientName={modal.clientName}
         date={modal.date}
         absentEmployeeName={modal.absentEmployeeName}
+        absentEmployeeId={modal.absentEmployeeId}
       />
     </div>
   );

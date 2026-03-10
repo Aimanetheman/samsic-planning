@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import {
   Search,
   Filter,
@@ -156,9 +157,10 @@ export default function ClientsPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {clients.map((client) => (
-                <div
+                <Link
                   key={client.id}
-                  className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 hover:shadow-md transition-shadow"
+                  href={`/clients/${client.id}`}
+                  className="block bg-white rounded-xl border border-gray-200 shadow-sm p-5 hover:shadow-md hover:border-primary-200 transition-all"
                 >
                   {/* Title & Priority */}
                   <div className="flex items-start justify-between mb-3">
@@ -206,7 +208,7 @@ export default function ClientsPage() {
                     </div>
                     <StatusBadge status={client.couvert ? 'couvert' : 'non_couvert'} />
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}

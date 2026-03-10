@@ -2,6 +2,12 @@
 // Samsic Planning IA - In-Memory Data Store
 // Initializes from seed data, provides CRUD operations.
 // All mutations return the updated entity for easy response handling.
+//
+// Serverless note: on Vercel, this module may be cached across
+// requests within a single cold-start instance. The store is
+// initialized lazily via ensureInitialized(), which API routes
+// must call before accessing data. Dates in seed data are always
+// computed fresh at initialization time.
 // ============================================================
 
 import type {
@@ -18,30 +24,51 @@ import type {
 import {
   seedEmployees,
   seedClients,
-  seedAffectations,
-  seedAbsences,
-  seedAlerts,
+  generateSeedAffectations,
+  generateSeedAbsences,
+  generateSeedAlerts,
 } from './data';
 
-// --- In-memory state (initialized from seed data) ---
+// --- In-memory state ---
 
 let employees: Map<string, Employee> = new Map();
 let clients: Map<string, Client> = new Map();
 let affectations: Map<string, Affectation> = new Map();
 let absences: Map<string, Absence> = new Map();
 let alerts: Map<string, Alert> = new Map();
+let initialized = false;
 
 // --- Initialize ---
 
 function loadSeedData() {
+  // Clone employees and clients (static data)
   employees = new Map(seedEmployees.map((e) => [e.id, structuredClone(e)]));
   clients = new Map(seedClients.map((c) => [c.id, structuredClone(c)]));
-  affectations = new Map(seedAffectations.map((a) => [a.id, structuredClone(a)]));
-  absences = new Map(seedAbsences.map((a) => [a.id, structuredClone(a)]));
-  alerts = new Map(seedAlerts.map((a) => [a.id, structuredClone(a)]));
+
+  // Generate date-dependent data fresh each time so dates are always current
+  const freshAffectations = generateSeedAffectations();
+  const freshAbsences = generateSeedAbsences();
+  const freshAlerts = generateSeedAlerts();
+
+  affectations = new Map(freshAffectations.map((a) => [a.id, a]));
+  absences = new Map(freshAbsences.map((a) => [a.id, a]));
+  alerts = new Map(freshAlerts.map((a) => [a.id, a]));
+
+  initialized = true;
 }
 
-// Auto-initialize on first import
+/**
+ * Ensure the store is initialized before any data access.
+ * Safe to call multiple times -- only initializes once per cold start.
+ * API routes should call this at the top of every handler.
+ */
+export function ensureInitialized(): void {
+  if (!initialized) {
+    loadSeedData();
+  }
+}
+
+// Auto-initialize on first import (belt-and-suspenders with ensureInitialized)
 loadSeedData();
 
 // --- ID generation ---
@@ -267,23 +294,32 @@ export function getDashboardKPI(): DashboardKPI {
     (e) => e.statut === 'actif'
   ).length;
 
+  // Count all absences for today that are not already resolved (couverte)
   const todayAbsences = Array.from(absences.values()).filter(
     (a) => a.date === todayStr && a.statut !== 'couverte'
   );
   const absencesAujourdhui = todayAbsences.length;
 
-  // A post is uncovered if there is an absence today without a confirmed replacement
+  // A post is uncovered when a client has an active absence today and
+  // no confirmed replacement affectation exists for that client on that date.
+  // We count unique clients, not individual absences, because one replacement
+  // covers the post regardless of how many titulaires are absent.
   const allAffectations = Array.from(affectations.values());
-  const postesNonCouverts = todayAbsences.filter((absence) => {
+  const clientsWithAbsence = new Set(todayAbsences.map((a) => a.client_id));
+
+  let postesNonCouverts = 0;
+  for (const clientId of clientsWithAbsence) {
     const hasReplacement = allAffectations.some(
       (aff) =>
-        aff.client_id === absence.client_id &&
+        aff.client_id === clientId &&
         aff.date === todayStr &&
         aff.type === 'remplacement' &&
         aff.statut === 'confirme'
     );
-    return !hasReplacement;
-  }).length;
+    if (!hasReplacement) {
+      postesNonCouverts++;
+    }
+  }
 
   return {
     clients_actifs: clientsActifs,
@@ -298,6 +334,7 @@ export function getDashboardKPI(): DashboardKPI {
 // ============================================================
 
 export function resetStore(): void {
+  initialized = false;
   loadSeedData();
   idCounter = 1000;
 }

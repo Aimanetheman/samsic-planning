@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getClients, createClient } from '@/lib/store';
+import { ensureInitialized, getClients, createClient } from '@/lib/store';
 import { errorResponse, parseBody, getSearchParams } from '@/lib/api-utils';
 import type { Client } from '@/lib/types';
 
@@ -9,6 +9,7 @@ import type { Client } from '@/lib/types';
  */
 export async function GET(request: Request) {
   try {
+    ensureInitialized();
     const params = getSearchParams(request);
     const search = params.get('search')?.toLowerCase();
     const priority = params.get('priority');
@@ -40,6 +41,7 @@ export async function GET(request: Request) {
  */
 export async function POST(request: Request) {
   try {
+    ensureInitialized();
     const { data, error } = await parseBody<Omit<Client, 'id'>>(request);
     if (error) return error;
 

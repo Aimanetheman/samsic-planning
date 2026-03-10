@@ -127,6 +127,7 @@ export interface MatchCandidate {
 export type AlertType =
   | 'absence'
   | 'poste_non_couvert'
+  | 'remplacement_confirme'
   | 'formation_expiree'
   | 'refresh'
   | 'conflit_horaire'

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAbsenceById, updateAbsence } from '@/lib/store';
+import { ensureInitialized, getAbsenceById, updateAbsence } from '@/lib/store';
 import { errorResponse, parseBody } from '@/lib/api-utils';
 import type { Absence } from '@/lib/types';
 
@@ -11,6 +11,7 @@ type RouteContext = { params: Promise<{ id: string }> };
  */
 export async function GET(_request: Request, context: RouteContext) {
   try {
+    ensureInitialized();
     const { id } = await context.params;
     const absence = getAbsenceById(id);
 
@@ -31,6 +32,7 @@ export async function GET(_request: Request, context: RouteContext) {
  */
 export async function PATCH(request: Request, context: RouteContext) {
   try {
+    ensureInitialized();
     const { id } = await context.params;
     const { data, error } = await parseBody<Partial<Absence>>(request);
     if (error) return error;

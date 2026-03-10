@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { startOfWeek, addDays, format } from 'date-fns';
-import { getClients, getAffectations, getAbsences } from '@/lib/store';
+import { ensureInitialized, getClients, getAffectations, getAbsences } from '@/lib/store';
 import { findReplacementsForSlot } from '@/lib/matching-engine';
 import { errorResponse, parseBody } from '@/lib/api-utils';
 
@@ -55,6 +55,7 @@ function findUncoveredSlots(monday: Date): { client_id: string; date: string }[]
  */
 export async function POST(request: Request) {
   try {
+    ensureInitialized();
     const { data, error } = await parseBody<AutoFillRequest>(request);
     if (error) return error;
 

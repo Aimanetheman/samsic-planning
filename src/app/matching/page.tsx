@@ -96,11 +96,51 @@ function MatchingContentInner() {
   const handleValidate = async (candidate: MatchCandidate) => {
     setValidating(true);
     try {
+      // First, find or create an absence record for this client+date
+      let absenceId: string | null = null;
+
+      // Try to find an existing open absence
+      const searchRes = await fetch(`/api/absences?date=${selectedDate}&status=ouverte`);
+      if (searchRes.ok) {
+        const searchJson = await searchRes.json();
+        const existing = searchJson.data?.find(
+          (a: { client_id: string }) => a.client_id === selectedClientId
+        );
+        if (existing) absenceId = existing.id;
+      }
+
+      // If no existing absence, create one using the first titulaire of the client as absentee
+      if (!absenceId && client) {
+        const absentEmpId = client.titulaires[0];
+        if (absentEmpId) {
+          const absRes = await fetch('/api/absences', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              employe_id: absentEmpId,
+              client_id: selectedClientId,
+              date: selectedDate,
+              type: 'imprevue',
+              channel: 'telephone',
+              statut: 'ouverte',
+            }),
+          });
+          if (absRes.ok) {
+            const absJson = await absRes.json();
+            absenceId = absJson.data.id;
+          }
+        }
+      }
+
+      if (!absenceId) {
+        throw new Error(t('matching.error_validation'));
+      }
+
       const res = await fetch('/api/matching/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          absence_id: 'abs-001',
+          absence_id: absenceId,
           employe_id: candidate.employe_id,
         }),
       });

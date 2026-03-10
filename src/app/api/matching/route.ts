@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { findReplacementsWithMeta, findReplacementsForSlot } from '@/lib/matching-engine';
 import { getAIAnalysis } from '@/lib/ai-matching';
-import { getClients } from '@/lib/store';
+import { ensureInitialized, getClients } from '@/lib/store';
 import { errorResponse, parseBody } from '@/lib/api-utils';
 
 interface MatchByAbsence {
@@ -30,6 +30,7 @@ function isMatchBySlot(body: MatchRequest): body is MatchBySlot {
  */
 export async function POST(request: Request) {
   try {
+    ensureInitialized();
     const { data, error } = await parseBody<MatchRequest>(request);
     if (error) return error;
 

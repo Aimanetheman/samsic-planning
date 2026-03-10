@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAlerts, markAlertRead } from '@/lib/store';
+import { ensureInitialized, getAlerts, markAlertRead } from '@/lib/store';
 import { errorResponse, parseBody, getSearchParams } from '@/lib/api-utils';
 
 /**
@@ -9,6 +9,7 @@ import { errorResponse, parseBody, getSearchParams } from '@/lib/api-utils';
  */
 export async function GET(request: Request) {
   try {
+    ensureInitialized();
     const params = getSearchParams(request);
     const priority = params.get('priority');
     const unread = params.get('unread');
@@ -36,6 +37,7 @@ export async function GET(request: Request) {
  */
 export async function PATCH(request: Request) {
   try {
+    ensureInitialized();
     const { data, error } = await parseBody<{ id: string }>(request);
     if (error) return error;
 

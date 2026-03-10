@@ -119,7 +119,7 @@ export default function DashboardPage() {
     <div className="p-6 lg:p-8 max-w-7xl">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">{t('dashboard.title')}</h1>
+        <h1 className="text-2xl font-bold text-samsic-dark">{t('dashboard.title')}</h1>
         <p className="text-sm text-gray-500 mt-1">
           {t('dashboard.subtitle')}
         </p>
@@ -229,7 +229,11 @@ export default function DashboardPage() {
                 const cli = clientMap.get(item.client_id);
                 const emp = empMap.get(item.employe_id);
                 return (
-                  <div key={item.affectation_id} className="px-5 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                  <Link
+                    key={item.affectation_id}
+                    href={`/clients/${item.client_id}`}
+                    className="block px-5 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                  >
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">
                         {cli?.nom ?? item.client_id}
@@ -241,7 +245,7 @@ export default function DashboardPage() {
                     <StatusBadge
                       status={item.type as 'titulaire' | 'formation' | 'stand_by' | 'remplacement'}
                     />
-                  </div>
+                  </Link>
                 );
               })
             )}

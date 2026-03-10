@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import {
+  ensureInitialized,
   getAbsences,
   getClientById,
   getEmployeeById,
@@ -16,6 +17,7 @@ import type { Absence, AbsenceStatus } from '@/lib/types';
  */
 export async function GET(request: Request) {
   try {
+    ensureInitialized();
     const params = getSearchParams(request);
     const status = params.get('status') as AbsenceStatus | null;
     const date = params.get('date');
@@ -38,6 +40,7 @@ export async function GET(request: Request) {
  */
 export async function POST(request: Request) {
   try {
+    ensureInitialized();
     const { data, error } = await parseBody<Omit<Absence, 'id' | 'created_at'>>(request);
     if (error) return error;
 
