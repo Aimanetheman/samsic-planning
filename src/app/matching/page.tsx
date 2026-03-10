@@ -17,10 +17,18 @@ import { ScoreBar, getScoreTextColor } from '@/components/ScoreBar';
 import { useTranslation, getDateLocale } from '@/lib/i18n';
 import type { MatchCandidate, LanguageLevel, Client } from '@/lib/types';
 
+interface AIAnalysis {
+  recommendation: string;
+  reasoning: string;
+  riskAssessment: string;
+  alternativeStrategy: string;
+}
+
 interface MatchingData {
   candidates: MatchCandidate[];
   analysis_time_ms: number;
   total_analyzed: number;
+  ai_analysis?: AIAnalysis | null;
 }
 
 function MatchingContentInner() {
@@ -185,6 +193,34 @@ function MatchingContentInner() {
       {error && !loading && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm mb-6">
           {error}
+        </div>
+      )}
+
+      {/* AI Analysis Panel */}
+      {data?.ai_analysis && !loading && (
+        <div className="bg-gradient-to-r from-primary-50 to-accent-50 border border-primary-200 rounded-xl p-5 mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <Brain className="h-5 w-5 text-primary-600" />
+            <h2 className="text-sm font-bold text-primary-900 uppercase tracking-wide">{t('matching.ai_insight')}</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs font-semibold text-primary-700 mb-1">{t('matching.ai_recommendation')}</p>
+              <p className="text-sm text-gray-800">{data.ai_analysis.recommendation}</p>
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-primary-700 mb-1">{t('matching.ai_reasoning')}</p>
+              <p className="text-sm text-gray-800">{data.ai_analysis.reasoning}</p>
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-accent-600 mb-1">{t('matching.ai_risk')}</p>
+              <p className="text-sm text-gray-800">{data.ai_analysis.riskAssessment}</p>
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-accent-600 mb-1">{t('matching.ai_alternative')}</p>
+              <p className="text-sm text-gray-800">{data.ai_analysis.alternativeStrategy}</p>
+            </div>
+          </div>
         </div>
       )}
 

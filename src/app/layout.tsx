@@ -4,6 +4,7 @@ import "./globals.css";
 import { Sidebar } from "@/components/Sidebar";
 import { TopBar } from "@/components/TopBar";
 import { LanguageProvider } from "@/lib/i18n";
+import { SidebarProvider } from "@/components/SidebarProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -28,9 +29,9 @@ export default function RootLayout({
           <div className="min-h-screen">
             <Sidebar />
             <TopBar />
-            <main className="ml-[52px] mt-12 bg-surface min-h-[calc(100vh-48px)]">
+            <SidebarProvider>
               {children}
-            </main>
+            </SidebarProvider>
           </div>
         </LanguageProvider>
       </body>

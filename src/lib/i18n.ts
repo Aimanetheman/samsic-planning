@@ -16,6 +16,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'nav.alertes': 'Alertes',
     'nav.formations': 'Formations',
     'nav.parametres': 'Parametres',
+    'nav.collapse': 'Reduire',
 
     // Dashboard
     'dashboard.title': 'Tableau de bord',
@@ -141,6 +142,11 @@ const translations: Record<Locale, Record<string, string>> = {
     'matching.error_validation': 'Erreur de validation',
     'matching.error_validation_generic': 'Erreur lors de la validation.',
     'matching.no_candidates_short': 'Aucun candidat disponible.',
+    'matching.ai_insight': 'Analyse IA',
+    'matching.ai_recommendation': 'Recommandation',
+    'matching.ai_reasoning': 'Raisonnement',
+    'matching.ai_risk': 'Evaluation des risques',
+    'matching.ai_alternative': 'Strategie alternative',
 
     // Alertes
     'alertes.title': 'Alertes',
@@ -236,6 +242,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'nav.alertes': 'Alerts',
     'nav.formations': 'Training',
     'nav.parametres': 'Settings',
+    'nav.collapse': 'Collapse',
 
     // Dashboard
     'dashboard.title': 'Dashboard',
@@ -361,6 +368,11 @@ const translations: Record<Locale, Record<string, string>> = {
     'matching.error_validation': 'Validation error',
     'matching.error_validation_generic': 'Error during validation.',
     'matching.no_candidates_short': 'No candidates available.',
+    'matching.ai_insight': 'AI Analysis',
+    'matching.ai_recommendation': 'Recommendation',
+    'matching.ai_reasoning': 'Reasoning',
+    'matching.ai_risk': 'Risk Assessment',
+    'matching.ai_alternative': 'Alternative Strategy',
 
     // Alertes
     'alertes.title': 'Alerts',

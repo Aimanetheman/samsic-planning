@@ -2,26 +2,56 @@
 
 @theme inline {
   --font-sans: var(--font-inter);
-  --color-primary-50: #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #3b82f6;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a8a;
-  --color-sidebar: #0f172a;
-  --color-sidebar-hover: #1e293b;
-  --color-sidebar-active: #1e3a8a;
-  --color-topbar: #1b2a3b;
-  --color-topbar-border: rgba(255, 255, 255, 0.1);
-  --color-surface: #f5f8fa;
+  /* Samsic Brand Colors */
+  --color-samsic-dark: #333d47;
+  --color-samsic-blue: #0099d4;
+  --color-samsic-blue-dark: #0081bb;
+  --color-samsic-warm: #c88769;
+  --color-samsic-light: #f9f7f6;
+  /* Primary = Samsic Blue */
+  --color-primary-50: #e6f6fc;
+  --color-primary-100: #ccedfa;
+  --color-primary-200: #99dbf4;
+  --color-primary-300: #66c9ef;
+  --color-primary-400: #33b7e9;
+  --color-primary-500: #0099d4;
+  --color-primary-600: #0081bb;
+  --color-primary-700: #006a99;
+  --color-primary-800: #005277;
+  --color-primary-900: #003b55;
+  /* Sidebar / TopBar */
+  --color-sidebar: #2a323b;
+  --color-sidebar-hover: #3a4450;
+  --color-sidebar-active: #0081bb;
+  --color-topbar: #333d47;
+  --color-topbar-border: rgba(255, 255, 255, 0.12);
+  /* Surface */
+  --color-surface: #f5f7f9;
+  /* Warm accent */
+  --color-accent-50: #fdf5f1;
+  --color-accent-100: #f8e5db;
+  --color-accent-200: #f0cbb7;
+  --color-accent-300: #dfa88a;
+  --color-accent-400: #c88769;
+  --color-accent-500: #b5714f;
+  --color-accent-600: #9a5d3f;
+  --color-accent-700: #7f4a33;
+  --color-accent-800: #643826;
+  --color-accent-900: #4a291c;
 }
 
 body {
   font-family: var(--font-inter, 'Inter', sans-serif);
+  background-color: var(--color-surface);
+}
+
+/* Smooth sidebar transition */
+.sidebar-transition {
+  transition: width 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.main-transition {
+  transition: margin-left 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Scrollbar */

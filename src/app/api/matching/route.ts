@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { findReplacementsWithMeta, findReplacementsForSlot } from '@/lib/matching-engine';
+import { getAIAnalysis } from '@/lib/ai-matching';
+import { getClients } from '@/lib/store';
 import { errorResponse, parseBody } from '@/lib/api-utils';
 
 interface MatchByAbsence {
@@ -23,17 +25,19 @@ function isMatchBySlot(body: MatchRequest): body is MatchBySlot {
 
 /**
  * POST /api/matching
- * Find replacement candidates.
+ * Find replacement candidates with AI analysis.
  * Accepts either { absence_id } or { client_id, date }.
- * Returns ranked candidates with scoring breakdown and analysis metadata.
  */
 export async function POST(request: Request) {
   try {
     const { data, error } = await parseBody<MatchRequest>(request);
     if (error) return error;
 
+    let result;
+    let clientId: string | undefined;
+
     if (isMatchByAbsence(data)) {
-      const result = findReplacementsWithMeta(data.absence_id);
+      result = findReplacementsWithMeta(data.absence_id);
       if (!result) {
         return errorResponse(
           404,
@@ -41,10 +45,7 @@ export async function POST(request: Request) {
           `Absence '${data.absence_id}' introuvable ou client associe introuvable`
         );
       }
-      return NextResponse.json({ data: result });
-    }
-
-    if (isMatchBySlot(data)) {
+    } else if (isMatchBySlot(data)) {
       if (!data.client_id || !data.date) {
         return errorResponse(
           400,
@@ -52,19 +53,61 @@ export async function POST(request: Request) {
           'client_id et date sont obligatoires pour la recherche par creneau'
         );
       }
-
-      const result = findReplacementsForSlot(data.client_id, data.date);
+      clientId = data.client_id;
+      result = findReplacementsForSlot(data.client_id, data.date);
       if (!result) {
         return errorResponse(404, 'NOT_FOUND', `Client '${data.client_id}' introuvable`);
       }
-      return NextResponse.json({ data: result });
+    } else {
+      return errorResponse(
+        400,
+        'VALIDATION_ERROR',
+        'Le corps doit contenir soit { absence_id } soit { client_id, date }'
+      );
     }
 
-    return errorResponse(
-      400,
-      'VALIDATION_ERROR',
-      'Le corps doit contenir soit { absence_id } soit { client_id, date }'
-    );
+    // Enrich with AI analysis (server-side only, API key never exposed)
+    let aiAnalysis = null;
+    try {
+      const clients = getClients();
+      const client = clientId
+        ? clients.find(c => c.id === clientId)
+        : clients[0]; // fallback
+
+      if (client && result.candidates.length > 0) {
+        const dateStr = isMatchBySlot(data) ? data.date : new Date().toISOString().split('T')[0];
+        aiAnalysis = await getAIAnalysis({
+          clientName: client.nom,
+          clientAddress: client.adresse,
+          requiredLanguages: client.langues_requises.map(l => l.language),
+          requiredSkills: client.competences_requises,
+          requiredCertifications: client.certifications_requises,
+          schedule: `${client.horaire_debut} - ${client.horaire_fin}`,
+          absentEmployeeName: 'Employe absent',
+          date: dateStr,
+          candidates: result.candidates.map(c => ({
+            name: `${c.employe_prenom} ${c.employe_nom}`,
+            score: c.score_total,
+            languages: c.raisons.filter(r => r.includes('langue') || r.includes('FR') || r.includes('EN') || r.includes('DE')),
+            skills: c.raisons,
+            isStandby: c.is_standby,
+            isAvailable: c.is_available,
+            reasons: c.raisons,
+            exclusionReasons: c.exclusion_raisons,
+          })),
+        });
+      }
+    } catch (aiError) {
+      console.error('[AI Analysis] Error:', aiError);
+      // AI analysis is non-blocking, continue without it
+    }
+
+    return NextResponse.json({
+      data: {
+        ...result,
+        ai_analysis: aiAnalysis,
+      },
+    });
   } catch (error) {
     console.error('[POST /api/matching] Unexpected error:', error);
     return errorResponse(500, 'INTERNAL_ERROR', 'Erreur interne du serveur');

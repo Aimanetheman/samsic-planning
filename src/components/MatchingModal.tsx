@@ -17,10 +17,18 @@ interface MatchingModalProps {
   absentEmployeeName: string;
 }
 
+interface AIAnalysis {
+  recommendation: string;
+  reasoning: string;
+  riskAssessment: string;
+  alternativeStrategy: string;
+}
+
 interface MatchingData {
   candidates: MatchCandidate[];
   analysis_time_ms: number;
   total_analyzed: number;
+  ai_analysis?: AIAnalysis | null;
 }
 
 export function MatchingModal({
@@ -197,8 +205,19 @@ export function MatchingModal({
                 </div>
               )}
 
-              {/* Right: Candidates */}
+              {/* Right: Candidates + AI */}
               <div className={clsx(client ? 'lg:col-span-2' : 'lg:col-span-3', 'p-6')}>
+                {/* AI Analysis */}
+                {data.ai_analysis && (
+                  <div className="bg-gradient-to-r from-primary-50 to-accent-50 border border-primary-200 rounded-xl p-4 mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <AlertTriangle className="h-4 w-4 text-primary-600" />
+                      <span className="text-xs font-bold text-primary-900 uppercase tracking-wide">{t('matching.ai_insight')}</span>
+                    </div>
+                    <p className="text-sm text-gray-800 mb-2">{data.ai_analysis.recommendation}</p>
+                    <p className="text-xs text-gray-600">{data.ai_analysis.reasoning}</p>
+                  </div>
+                )}
                 <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-4">
                   {t('matching.suggestions')} ({availableCandidates.length} {t('matching.disponibles')})
                 </h3>
