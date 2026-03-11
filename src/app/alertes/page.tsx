@@ -192,9 +192,16 @@ export default function AlertesPage() {
                     {alert.action_url && (
                       <Link
                         href={alert.action_url}
-                        className="inline-flex items-center gap-1 rounded-lg bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-700 hover:bg-primary-100 transition-colors"
+                        className={clsx(
+                          'inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors',
+                          alert.action_url.startsWith('/matching')
+                            ? 'bg-red-500 text-white hover:bg-red-600'
+                            : 'bg-primary-50 text-primary-700 hover:bg-primary-100'
+                        )}
                       >
-                        {t('alertes.action')}
+                        {alert.action_url.startsWith('/matching')
+                          ? t('alertes.trouver_remplacement')
+                          : t('alertes.action')}
                         <ArrowRight className="h-3 w-3" />
                       </Link>
                     )}

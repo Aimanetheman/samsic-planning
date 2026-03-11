@@ -778,6 +778,7 @@ export function generateSeedAbsences(): Absence[] {
 // ============================================================
 
 export function generateSeedAlerts(): Alert[] {
+  const todayStr = today();
   const nowIso = new Date().toISOString();
 
   return [
@@ -790,7 +791,7 @@ export function generateSeedAlerts(): Alert[] {
       related_client_id: 'cli-001',
       related_employe_id: 'emp-003',
       is_read: false,
-      action_url: '/absences/abs-001',
+      action_url: `/matching?client=cli-001&date=${todayStr}`,
       created_at: nowIso,
     },
     {
@@ -801,7 +802,7 @@ export function generateSeedAlerts(): Alert[] {
       description: 'Le poste accueil Banque Fortuna n\'a pas de remplacement confirmé pour aujourd\'hui.',
       related_client_id: 'cli-001',
       is_read: false,
-      action_url: '/planning',
+      action_url: `/matching?client=cli-001&date=${todayStr}`,
       created_at: nowIso,
     },
     {
@@ -813,7 +814,7 @@ export function generateSeedAlerts(): Alert[] {
       related_client_id: 'cli-002',
       related_employe_id: 'emp-004',
       is_read: false,
-      action_url: '/absences/abs-002',
+      action_url: `/matching?client=cli-002&date=${todayStr}`,
       created_at: nowIso,
     },
     {
@@ -824,7 +825,7 @@ export function generateSeedAlerts(): Alert[] {
       description: 'Le poste accueil Cabinet Albers & Associés n\'a pas de remplacement confirmé pour aujourd\'hui.',
       related_client_id: 'cli-002',
       is_read: false,
-      action_url: '/planning',
+      action_url: `/matching?client=cli-002&date=${todayStr}`,
       created_at: nowIso,
     },
     {
@@ -836,7 +837,7 @@ export function generateSeedAlerts(): Alert[] {
       related_client_id: 'cli-005',
       related_employe_id: 'emp-013',
       is_read: false,
-      action_url: '/absences/abs-003',
+      action_url: `/matching?client=cli-005&date=${weekday(3)}`,
       created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     },
     {
@@ -847,7 +848,7 @@ export function generateSeedAlerts(): Alert[] {
       description: 'La certification "Accueil & Sécurité" de Laura Hoffmann a expiré le 01/05/2025. Renouvellement requis.',
       related_employe_id: 'emp-009',
       is_read: false,
-      action_url: '/employes/emp-009',
+      action_url: '/personnel/emp-009',
       created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     },
     {
@@ -868,7 +869,7 @@ export function generateSeedAlerts(): Alert[] {
       title: 'Rappel formation - 3 employés',
       description: '3 employés ont des formations qui expireront dans les 90 prochains jours.',
       is_read: true,
-      action_url: '/employes',
+      action_url: '/personnel',
       created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     },
   ];

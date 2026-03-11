@@ -16,7 +16,25 @@ const translations: Record<Locale, Record<string, string>> = {
     'nav.alertes': 'Alertes',
     'nav.formations': 'Formations',
     'nav.parametres': 'Parametres',
+    'nav.absences': 'Absences',
     'nav.collapse': 'Reduire',
+
+    // Absences
+    'absences.title': 'Gestion des absences',
+    'absences.a_traiter': 'absence(s) a traiter',
+    'absences.toutes_couvertes': 'Toutes les absences sont couvertes',
+    'absences.aujourdhui': "Absences aujourd'hui",
+    'absences.a_venir': 'Absences a venir',
+    'absences.aucune': 'Aucune absence enregistree.',
+    'absences.type_maladie': 'MALADIE',
+    'absences.type_imprevue': 'IMPREVUE',
+    'absences.type_conge': 'CONGE',
+    'absences.statut_ouverte': 'A traiter',
+    'absences.statut_couverte': 'Couvert',
+    'absences.statut_non_couverte': 'Non couvert',
+    'absences.trouver_remplacement': 'Trouver remplacement IA',
+    'absences.remplacement_confirme': 'Remplacement confirme',
+    'absences.error_loading': 'Impossible de charger les absences.',
 
     // Dashboard
     'dashboard.title': 'Tableau de bord',
@@ -31,6 +49,8 @@ const translations: Record<Locale, Record<string, string>> = {
     'dashboard.voir_planning': 'Voir planning',
     'dashboard.no_affectations': "Aucune affectation pour aujourd'hui",
     'dashboard.voir_alertes': 'Voir toutes les alertes',
+    'dashboard.action_requise': 'Action urgente requise',
+    'dashboard.traiter_absences': 'Traiter les absences',
     'dashboard.error': 'Impossible de charger le tableau de bord. Veuillez rafraichir la page.',
 
     // Personnel
@@ -181,6 +201,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'alertes.il_y_a_h': 'Il y a {n}h',
     'alertes.hier': 'Hier',
     'alertes.il_y_a_jours': 'Il y a {n} jours',
+    'alertes.trouver_remplacement': 'Trouver remplacement',
     'alertes.error_loading': 'Impossible de charger les alertes.',
 
     // Formations
@@ -257,7 +278,25 @@ const translations: Record<Locale, Record<string, string>> = {
     'nav.alertes': 'Alerts',
     'nav.formations': 'Training',
     'nav.parametres': 'Settings',
+    'nav.absences': 'Absences',
     'nav.collapse': 'Collapse',
+
+    // Absences
+    'absences.title': 'Absence Management',
+    'absences.a_traiter': 'absence(s) to handle',
+    'absences.toutes_couvertes': 'All absences are covered',
+    'absences.aujourdhui': "Today's absences",
+    'absences.a_venir': 'Upcoming absences',
+    'absences.aucune': 'No absences recorded.',
+    'absences.type_maladie': 'SICK LEAVE',
+    'absences.type_imprevue': 'UNPLANNED',
+    'absences.type_conge': 'LEAVE',
+    'absences.statut_ouverte': 'To handle',
+    'absences.statut_couverte': 'Covered',
+    'absences.statut_non_couverte': 'Uncovered',
+    'absences.trouver_remplacement': 'Find AI replacement',
+    'absences.remplacement_confirme': 'Replacement confirmed',
+    'absences.error_loading': 'Unable to load absences.',
 
     // Dashboard
     'dashboard.title': 'Dashboard',
@@ -272,6 +311,8 @@ const translations: Record<Locale, Record<string, string>> = {
     'dashboard.voir_planning': 'View schedule',
     'dashboard.no_affectations': 'No assignments for today',
     'dashboard.voir_alertes': 'View all alerts',
+    'dashboard.action_requise': 'Urgent action required',
+    'dashboard.traiter_absences': 'Handle absences',
     'dashboard.error': 'Unable to load the dashboard. Please refresh the page.',
 
     // Personnel
@@ -422,6 +463,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'alertes.il_y_a_h': '{n}h ago',
     'alertes.hier': 'Yesterday',
     'alertes.il_y_a_jours': '{n} days ago',
+    'alertes.trouver_remplacement': 'Find replacement',
     'alertes.error_loading': 'Unable to load alerts.',
 
     // Formations

@@ -9,6 +9,7 @@ import {
   ShieldAlert,
   Calendar,
   ArrowRight,
+  Brain,
   Loader2,
 } from 'lucide-react';
 import { KPICard } from '@/components/KPICard';
@@ -152,6 +153,32 @@ export default function DashboardPage() {
           color={data.kpi.postes_non_couverts > 0 ? 'red' : 'green'}
         />
       </div>
+
+      {/* Urgent Absence Banner */}
+      {data.kpi.postes_non_couverts > 0 && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-5 mb-6">
+          <div className="flex items-start gap-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-100 flex-shrink-0">
+              <ShieldAlert className="h-5 w-5 text-red-600" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-base font-bold text-red-900">
+                {data.kpi.postes_non_couverts} {t('dashboard.postes_non_couverts')}
+              </h2>
+              <p className="text-sm text-red-700 mt-1">
+                {data.kpi.absences_aujourdhui} {t('dashboard.absences_today').toLowerCase()} - {t('dashboard.action_requise')}
+              </p>
+            </div>
+            <Link
+              href="/absences"
+              className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition-colors shadow-sm flex-shrink-0"
+            >
+              <Brain className="h-4 w-4" />
+              {t('dashboard.traiter_absences')}
+            </Link>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Alerts Section */}
